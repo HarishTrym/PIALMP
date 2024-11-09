@@ -1,0 +1,86 @@
+<style>
+    form {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        margin: auto;
+    }
+    label {
+        display: block;
+        margin: 10px 0 5px;
+    }
+    .form_input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    button {
+        background-color: #28a745;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    button:hover {
+       background-color: #218838;
+    }
+    .btn-volver {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .btn-volver:hover {
+            background-color: #2980b9;
+        }
+</style>
+
+<style>
+    body {
+        background-color: #f8f9fa; /* Color de fondo suave */
+    }
+    html{
+      min-width: 300px;
+    }
+</style>
+
+<img src="static/grafica1.png" alt="Grafica de Datos">
+
+<form action="/actualizar_calificacion/{{dato[0]}}" method="POST">
+    <label for="nombre">Estudiante: <a class="button" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal">Añadir estudiante</a></label>
+    <select id="nombre" name="nombre" class="form_input" required>
+      <option value="" disabled selected>Selecciona al estudiante</option>
+      {% for estudiante in estudiantes %}
+        <option value="{{ estudiante[0] }}" {% if estudiante[1] == dato[1] %} selected {% endif %}>{{ estudiante[1] }}</option>
+      {% endfor %}
+    </select>
+
+      <label for="materia">Materia: <a class="button" data-bs-target="#exampleModalToggle3" data-bs-toggle="modal">Añadir materia</a></label>
+      <select id="materia" name="materia" class="form_input" required>
+        <option value="" disabled selected>Selecciona una materia</option>
+        {% for materia in materias %}
+          <option value="{{ materia[0]}}" {% if materia[1] == dato[2] %} selected {% endif %}>{{ materia[1] }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="calificacion">Calificación:</label>
+      <input type="number" id="calificacion" name="calificacion" class="form_input" value ="{{ dato[3] }}" required>
+
+      <label for="comentario">Comentario:</label>
+      <input type="text" id="comentario" name="comentario" class="form_input" value ="{{ dato[4] }}" required>
+      <button type="submit">Enviar</button>
+      <a href="/" class="btn-volver">Volver</a>
+  </form>

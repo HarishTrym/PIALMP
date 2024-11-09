@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calificaciones</title>
+</head>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<body>
+
+      <button type="button" class="btn-volver" data-bs-toggle="modal" data-bs-target="#exampleModal2">
+        Crear Nuevo
+      </button>
+
+      <button type="button" class="btn-volver2" onclick=window.location.href='{{ url_for("calificaciones") }}'>
+        Editar
+      </button>
+
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Nuevo Estudiante</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/añadir_calificacion" method="POST">
+                  <label for="nombre">Estudiante: <a class="button" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal">Añadir estudiante</a></label>
+                  <select id="nombre" name="nombre" class="form_input" required>
+                    <option value="" disabled selected>Selecciona al estudiante</option>
+                    {% for estudiante in estudiantes %}
+                      <option value="{{ estudiante[0] }}">{{ estudiante[1] }}</option>
+                    {% endfor %}
+                  </select>
+
+                    <label for="materia">Materia: <a class="button" data-bs-target="#exampleModalToggle3" data-bs-toggle="modal">Añadir materia</a></label>
+                    <select id="materia" name="materia" class="form_input" required>
+                      <option value="" disabled selected>Selecciona una materia</option>
+                      {% for materia in materias %}
+                        <option value="{{ materia[0]}}">{{ materia[1] }}</option>
+                      {% endfor %}
+                    </select>
+
+                    <label for="calificacion">Calificación:</label>
+                    <input type="number" id="calificacion" name="calificacion" class="form_input" required>
+
+                    <label for="comentario">Comentario:</label>
+                    <input type="text" id="comentario" name="comentario" class="form_input" required>
+                    <button type="submit">Enviar</button>
+                </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalToggleLabel2">Nuevo Estudiante</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form action="/añadir_estudiante" method="POST">
+                  <label for="nombre">Nombre:</label>
+                  <input type="text" id="nombre" name="nombre" class="form_input" required>
+  
+                  <label for="Matricula">Matricula:</label>
+                  <input type="number" id="matricula" name="matricula" class="form_input" required>
+          
+                  <button type="submit">Enviar</button>
+              </form>
+          </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" data-bs-target="#exampleModal2" data-bs-toggle="modal">Volver</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="exampleModalToggle3" aria-hidden="true" aria-labelledby="exampleModalToggleLabel3" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalToggleLabel3">Nueva Materia</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form action="/añadir_materia" method="POST">
+                  <label for="nombre">Nombre:</label>
+                  <input type="text" id="nombre" name="nombre" class="form_input" required>
+                  <button type="submit">Enviar</button>
+              </form>
+          </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" data-bs-target="#exampleModal2" data-bs-toggle="modal">Volver</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<ul class="nav nav-pills nav-fill">
+  <li class="nav-item">
+    <a class="nav-link active" href="#">Calificaciones</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" aria-current="page" href="/materias">Materias</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/estudiantes">Estudiantes</a>
+  </li>
+</ul>
+
+<div class="accordion custom-accordion" id="accordionExample">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          Últimas 5 calificaciones
+        </button>
+      </h2>
+      <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+            <img src="{{ imagen1 }}" alt="Gráfica de Datos">
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            Últimas 10 calificaciones
+        </button>
+      </h2>
+      <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+            <img src="{{ imagen2 }}" alt="Gráfica de Datos">
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            Últimas 20 calificaciones
+        </button>
+      </h2>
+      <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+            <img src="{{ imagen3 }}" alt="Gráfica de Datos">
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+            Todas las calificaciones
+          </button>
+        </h2>
+        <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+              <img src="{{ imagen4 }}" alt="Gráfica de Datos">
+          </div>
+        </div>
+      </div>
+</div>
+
+<style>
+    .btn-volver {
+        position: fixed;
+        top: 47px;
+        right: 20px;
+        padding: 10px 20px;
+        background-color: #34db69;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+    .btn-volver:hover {
+        background-color: #2980b9;
+    }
+    .btn-volver2 {
+        position: fixed;
+        top: 107px;
+        right: 20px;
+        padding: 10px 20px;
+        background-color: #34db69;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+    .btn-volver2:hover {
+        background-color: #2980b9;
+    }
+</style>
+
+<style>
+    form {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        margin: auto;
+    }
+    label {
+        display: block;
+        margin: 10px 0 5px;
+    }
+    .form_input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    button {
+        background-color: #28a745;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    button:hover {
+       background-color: #218838;
+    }
+</style>
+
+<style>
+    body {
+        background-color: #f8f9fa; /* Color de fondo suave */
+    }
+    html{
+      min-width: 300px;
+    }
+</style>
+
+<style>
+.custom-accordion {
+  width: 70%; /* Adjust as needed */
+  max-width: 1000px; /* Optional: Maximum width */
+  margin: 0 auto; /* Center the accordion */
+  margin-top: 50px; /* Space between the nav bar and accordion */
+}
+
+.accordion-body img {
+  width: 100%;   /* Make image fill the width of the accordion */
+  height: auto;  /* Maintain the aspect ratio */
+  display: block; /* Remove any inline-block space */
+  margin: 0 auto; /* Center the image */
+}
+</style>
+
+<style>
+  /* Estilo para los enlaces dentro de los modales */
+  .button {
+      color: #007bff; /* Color de texto azul claro */
+      text-decoration: none; /* Eliminar subrayado */
+      font-weight: 500; /* Un poco de negrita */
+      padding: 5px 10px;
+      border-radius: 4px;
+      display: inline-block;
+      transition: background-color 0.3s, color 0.3s; /* Transición suave */
+  }
+  
+
+  /* Estilo adicional para el modal que contiene los enlaces */
+  .modal-body a {
+      color: #007bff;
+      text-decoration: none;
+  }
+
+  .modal-body a:hover {
+      color: #0056b3;
+      text-decoration: underline;
+  }
+</style>
+</body>
+</html>

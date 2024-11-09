@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comentarios y Calificación</title>
+    <!-- Vincula los estilos de Bootstrap (versión 5) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        /* Estilos básicos */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        /* Estilo del formulario de búsqueda */
+        .search-form {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-form input {
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 50%;
+        }
+
+        .search-form button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .search-form button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Estilo de los comentarios */
+        .comment-box {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .comment-box:last-child {
+            border-bottom: none;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .comment-content {
+            margin: 10px 0;
+        }
+
+        .comment-date {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .comment-calification {
+            font-size: 1rem;
+            color: #333;
+        }
+        
+        .comment-header {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Estilos del botón de editar y eliminar */
+        .edit-btn, .delete-btn {
+            background-color: #ffc107;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            margin-right: 10px; /* Espacio entre botones */
+        }
+
+        .edit-btn:hover, .delete-btn:hover {
+            background-color: #e0a800;
+        }
+
+        .delete-btn {
+            background-color: #dc3545; /* Color rojo para el botón de eliminar */
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333; /* Color más oscuro para el hover */
+        }
+
+        .btn-volver {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .btn-volver:hover {
+            background-color: #2980b9;
+        }
+        .search-container {
+            position: relative;
+            width: 60%;
+            margin: 20px auto;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px 40px 10px 40px; /* Espacio para el ícono */
+            border: 1px solid #ccc;
+            border-radius: 20px; /* Esquinas redondeadas */
+            transition: border-color 0.3s;
+            outline: none; /* Elimina el contorno predeterminado */
+        }
+        .search-input:focus {
+            border-color: #007bff; /* Cambia el color del borde al enfocar */
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Sombra suave */
+        }
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none; /* Permite clics en el input */
+            color: #aaa; /* Color del ícono */
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="btn-volver">Volver</a>
+    <div class="container">
+        <h1>Calificaciones</h1>
+
+        <!-- Buscador dinámico -->
+        <div class="search-container">
+            <i class="search-icon fas fa-search"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar nombre..." onkeyup="filterComments()">
+        </div>
+        
+        <!-- Comentarios dinámicos -->
+        <div id="comments-section">
+            {% for dato in datos %}
+                <div class="comment-box" data-author="{{ dato.1 }}" id="comment-{{ dato.id }}">
+                    <div class="comment-header">
+                        <div class="comment-author">{{ dato.1 }}</div>
+                    </div>
+                    <div class="comment-content" id="content-{{ dato.id }}"><em>Materia: </em>{{ dato.2 }}</div>
+                    <div class="comment-content" id="content-{{ dato.id }}"><em>Comentario: </em>{{ dato.4 }}</div>
+                    <div class="comment-calification"><em>Calificación: </em>{{ dato.3 }}</div>
+                    <!-- Botones de editar y eliminar comentario -->
+                    <button class="edit-btn" onclick=window.location.href='{{ url_for("editar_calificacion", id = dato.0) }}'>
+                        Editar
+                    </button>
+                    <button class="delete-btn" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ dato.0 }}">
+                        Eliminar
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Modal de confirmación de eliminación (único modal fuera del bucle) -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirmación de eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar este comentario?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form id="deleteForm" method="POST" action="{{ url_for('eliminar_calificacion', id='') }}">
+                        <input type="hidden" name="id" id="commentId" value="">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Filtrar comentarios en el buscador
+        function filterComments() {
+            let searchValue = document.getElementById("searchInput").value.toLowerCase();
+            let comments = document.getElementsByClassName("comment-box");
+
+            // Normalización para ignorar acentos
+            searchValue = removeAccents(searchValue);
+
+            for (let i = 0; i < comments.length; i++) {
+                let comment = comments[i];
+                let author = comment.getAttribute("data-author").toLowerCase();
+
+                // Normalizar también el nombre del autor para la comparación
+                author = removeAccents(author);
+
+                if (author.includes(searchValue)) {
+                    comment.style.display = "";
+                } else {
+                    comment.style.display = "none";
+                }
+            }
+        }
+
+        // Función para eliminar los acentos de las cadenas de texto
+        function removeAccents(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        }
+
+        // Al hacer clic en el botón "Eliminar", actualizar la URL del formulario con el ID del comentario
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = button.getAttribute('data-id');
+                document.getElementById('commentId').value = commentId; // Establecer el valor del campo oculto
+                // Actualizar la URL del formulario con el id del comentario
+                document.getElementById('deleteForm').action = "/eliminar_calificacion/" + commentId;
+            });
+        });
+    </script>
+
+    <!-- Vincula los scripts de Bootstrap (JS y Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+</body>
+</html>
