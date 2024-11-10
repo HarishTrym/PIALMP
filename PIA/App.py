@@ -9,6 +9,7 @@ import os
 app = Flask(__name__, static_folder='static')
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = '1234'
 app.config['MYSQL_DB'] = 'evaluaciones'
 mysql = MySQL(app)
 
@@ -145,6 +146,43 @@ def EliminarGraficaMateria(id):
 def Index():
     cursor = mysql.connection.cursor()
     # Query to check if the table exists
+    cursor.execute("""
+      SELECT COUNT(*) 
+    FROM information_schema.tables 
+    WHERE table_schema = %s 
+    AND table_name = %s
+    """, ('evaluaciones', 'estudiantes'))
+
+    table_exists = cursor.fetchone()[0] > 0
+
+    if not table_exists:
+        cursor.execute("""
+        CREATE TABLE `evaluaciones`.`estudiantes` (
+        `idEstudiantes` INT NOT NULL AUTO_INCREMENT,
+        `nombre` VARCHAR(45) NULL,
+        `matricula` INT NULL,
+        `carrera` VARCHAR(45) NULL,
+        `semestre` INT NULL,
+        PRIMARY KEY (`idEstudiantes`));
+    """, )
+
+    cursor.execute("""
+      SELECT COUNT(*) 
+    FROM information_schema.tables 
+    WHERE table_schema = %s 
+    AND table_name = %s
+    """, ('evaluaciones', 'materias'))
+
+    table_exists = cursor.fetchone()[0] > 0
+
+    if not table_exists:
+        cursor.execute("""
+        CREATE TABLE `evaluaciones`.`materias` (
+        `idMaterias` INT NOT NULL AUTO_INCREMENT,
+        `nombre` VARCHAR(45) NULL,
+        PRIMARY KEY (`idMaterias`));
+    """, )
+        
     cursor.execute("""
       SELECT COUNT(*) 
     FROM information_schema.tables 
