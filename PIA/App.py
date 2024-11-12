@@ -7,7 +7,7 @@ import numpy as np
 import os
 
 app = Flask(__name__, static_folder='static')
-app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_HOST'] = 'mysql_db'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = '1234'
 app.config['MYSQL_DB'] = 'evaluaciones'
@@ -33,7 +33,7 @@ def CrearGraficas():
     plt.ylabel('Calificación')
         
     # Guardar la gráfica como imagen
-    imagen_path = os.path.join('PIA/static', 'grafica1.png')
+    imagen_path = os.path.join('static', 'grafica1.png')
     plt.savefig(imagen_path)
     plt.close()
 
@@ -53,7 +53,7 @@ def CrearGraficas():
     plt.ylabel('Calificación')
 
     # Guardar la gráfica como imagen
-    imagen_path = os.path.join('PIA/static', 'grafica2.png')
+    imagen_path = os.path.join('static', 'grafica2.png')
     plt.savefig(imagen_path)
     plt.close()
 
@@ -73,7 +73,7 @@ def CrearGraficas():
     plt.ylabel('Calificación')
         
     # Guardar la gráfica como imagen
-    imagen_path = os.path.join('PIA/static', 'grafica3.png')
+    imagen_path = os.path.join('static', 'grafica3.png')
     plt.savefig(imagen_path)
     plt.close()
 
@@ -88,7 +88,7 @@ def CrearGraficas():
     plt.ylabel('Calificación')
         
     # Guardar la gráfica como imagen
-    imagen_path = os.path.join('PIA/static', 'grafica4.png')
+    imagen_path = os.path.join('static', 'grafica4.png')
     plt.savefig(imagen_path)
     plt.close()
 
@@ -106,7 +106,7 @@ def CrearGraficaMateria(id):
     plt.ylabel('Calificación')
         
     # Guardar la gráfica como imagen
-    imagen_path = os.path.join('PIA/static', 'graficaMateria'+id+'.png')
+    imagen_path = os.path.join('static', 'graficaMateria'+id+'.png')
     plt.savefig(imagen_path)
     plt.close()
 
@@ -124,131 +124,135 @@ def CrearGraficaEstudiante(id):
     plt.ylabel('Calificación')
         
     # Guardar la gráfica como imagen
-    imagen_path = os.path.join('PIA/static', 'graficaEstudiante'+id+'.png')
+    imagen_path = os.path.join('static', 'graficaEstudiante'+id+'.png')
     plt.savefig(imagen_path)
     plt.close()
 
 def EliminarGraficaEstudiante(id):
     try:
-        imagen_path = os.path.join('PIA/static', 'graficaEstudiante'+id+'.png')
+        imagen_path = os.path.join('static', 'graficaEstudiante'+id+'.png')
         os.remove(imagen_path)
     except:
         pass
 
 def EliminarGraficaMateria(id):
     try:
-        imagen_path = os.path.join('PIA/static', 'graficaMateria'+id+'.png')
+        imagen_path = os.path.join('static', 'graficaMateria'+id+'.png')
         os.remove(imagen_path)
     except:
         pass
 
 @app.route('/')
 def Index():
-    cursor = mysql.connection.cursor()
-    # Query to check if the table exists
-    cursor.execute("""
-      SELECT COUNT(*) 
-    FROM information_schema.tables 
-    WHERE table_schema = %s 
-    AND table_name = %s
-    """, ('evaluaciones', 'estudiantes'))
-
-    table_exists = cursor.fetchone()[0] > 0
-
-    if not table_exists:
+    try:
+        cursor = mysql.connection.cursor()
+        # Query to check if the table exists
         cursor.execute("""
-        CREATE TABLE `evaluaciones`.`estudiantes` (
-        `idEstudiantes` INT NOT NULL AUTO_INCREMENT,
-        `nombre` VARCHAR(45) NULL,
-        `matricula` INT NULL,
-        `carrera` VARCHAR(45) NULL,
-        `semestre` INT NULL,
-        PRIMARY KEY (`idEstudiantes`));
-    """, )
+        SELECT COUNT(*) 
+        FROM information_schema.tables 
+        WHERE table_schema = %s 
+        AND table_name = %s
+        """, ('evaluaciones', 'estudiantes'))
 
-    cursor.execute("""
-      SELECT COUNT(*) 
-    FROM information_schema.tables 
-    WHERE table_schema = %s 
-    AND table_name = %s
-    """, ('evaluaciones', 'materias'))
+        table_exists = cursor.fetchone()[0] > 0
 
-    table_exists = cursor.fetchone()[0] > 0
-
-    if not table_exists:
-        cursor.execute("""
-        CREATE TABLE `evaluaciones`.`materias` (
-        `idMaterias` INT NOT NULL AUTO_INCREMENT,
-        `nombre` VARCHAR(45) NULL,
-        PRIMARY KEY (`idMaterias`));
-    """, )
-        
-    cursor.execute("""
-      SELECT COUNT(*) 
-    FROM information_schema.tables 
-    WHERE table_schema = %s 
-    AND table_name = %s
-    """, ('evaluaciones', 'asesoria'))
-
-    table_exists = cursor.fetchone()[0] > 0
-
-    if not table_exists:
-        cursor.execute("""
-        CREATE TABLE `evaluaciones`.`asesoria` (
-        `idAsesoria` INT NOT NULL AUTO_INCREMENT,
-        `idEstudiantes` INT NULL,
-        `idMaterias` INT NULL,
-        `calificacion` INT NULL,
-        `comentario` VARCHAR(200) NULL,
-        PRIMARY KEY (`idAsesoria`));
-    """, )
-        
-    cursor.execute("""
-      SELECT COUNT(*) 
-    FROM information_schema.tables 
-    WHERE table_schema = %s 
-    AND table_name = %s
-    """, ('evaluaciones', 'estudiantes'))
-
-    estudiantes_exists = cursor.fetchone()[0] > 0
-    
-    cursor.execute("""
-      SELECT COUNT(*) 
-    FROM information_schema.tables 
-    WHERE table_schema = %s 
-    AND table_name = %s
-    """, ('evaluaciones', 'materias'))
-
-    materias_exists = cursor.fetchone()[0] > 0
-    
-    if estudiantes_exists and materias_exists:
-        try:
+        if not table_exists:
             cursor.execute("""
-            ALTER TABLE `evaluaciones`.`asesoria`
-            ADD CONSTRAINT fk_asesoria_estudiante
-            FOREIGN KEY (`idEstudiantes`) REFERENCES `evaluaciones`.`estudiantes`(`idEstudiantes`)
-            ON DELETE CASCADE
-            ON UPDATE CASCADE;
-            """) 
+            CREATE TABLE `evaluaciones`.`estudiantes` (
+            `idEstudiantes` INT NOT NULL AUTO_INCREMENT,
+            `nombre` VARCHAR(45) NULL,
+            `matricula` INT NULL,
+            `carrera` VARCHAR(45) NULL,
+            `semestre` INT NULL,
+            PRIMARY KEY (`idEstudiantes`));
+        """, )
 
+        cursor.execute("""
+        SELECT COUNT(*) 
+        FROM information_schema.tables 
+        WHERE table_schema = %s 
+        AND table_name = %s
+        """, ('evaluaciones', 'materias'))
+
+        table_exists = cursor.fetchone()[0] > 0
+
+        if not table_exists:
             cursor.execute("""
+            CREATE TABLE `evaluaciones`.`materias` (
+            `idMaterias` INT NOT NULL AUTO_INCREMENT,
+            `nombre` VARCHAR(45) NULL,
+            PRIMARY KEY (`idMaterias`));
+        """, )
+            
+        cursor.execute("""
+        SELECT COUNT(*) 
+        FROM information_schema.tables 
+        WHERE table_schema = %s 
+        AND table_name = %s
+        """, ('evaluaciones', 'asesoria'))
+
+        table_exists = cursor.fetchone()[0] > 0
+
+        if not table_exists:
+            cursor.execute("""
+            CREATE TABLE `evaluaciones`.`asesoria` (
+            `idAsesoria` INT NOT NULL AUTO_INCREMENT,
+            `idEstudiantes` INT NULL,
+            `idMaterias` INT NULL,
+            `calificacion` INT NULL,
+            `comentario` VARCHAR(200) NULL,
+            PRIMARY KEY (`idAsesoria`));
+        """, )
+            
+        cursor.execute("""
+        SELECT COUNT(*) 
+        FROM information_schema.tables 
+        WHERE table_schema = %s 
+        AND table_name = %s
+        """, ('evaluaciones', 'estudiantes'))
+
+        estudiantes_exists = cursor.fetchone()[0] > 0
+        
+        cursor.execute("""
+        SELECT COUNT(*) 
+        FROM information_schema.tables 
+        WHERE table_schema = %s 
+        AND table_name = %s
+        """, ('evaluaciones', 'materias'))
+
+        materias_exists = cursor.fetchone()[0] > 0
+        
+        if estudiantes_exists and materias_exists:
+            try:
+                cursor.execute("""
                 ALTER TABLE `evaluaciones`.`asesoria`
-                ADD CONSTRAINT fk_asesoria_materia
-                FOREIGN KEY (`idMaterias`) REFERENCES `evaluaciones`.`materias`(`idMaterias`)
+                ADD CONSTRAINT fk_asesoria_estudiante
+                FOREIGN KEY (`idEstudiantes`) REFERENCES `evaluaciones`.`estudiantes`(`idEstudiantes`)
                 ON DELETE CASCADE
                 ON UPDATE CASCADE;
-            """)
-        except:
-            pass
+                """) 
+
+                cursor.execute("""
+                    ALTER TABLE `evaluaciones`.`asesoria`
+                    ADD CONSTRAINT fk_asesoria_materia
+                    FOREIGN KEY (`idMaterias`) REFERENCES `evaluaciones`.`materias`(`idMaterias`)
+                    ON DELETE CASCADE
+                    ON UPDATE CASCADE;
+                """)
+            except:
+                pass
+    except Exception as e:
+        return f"Error al conectar con la base de datos: {e}"
 
 
 
-    imagen1_path = os.path.join('PIA/static', 'grafica1.png')
-    imagen2_path = os.path.join('PIA/static', 'grafica2.png')
-    imagen3_path = os.path.join('PIA/static', 'grafica3.png')
-    imagen4_path = os.path.join('PIA/static', 'grafica4.png')
+    imagen1_path = os.path.join('static', 'grafica1.png')
+    imagen2_path = os.path.join('static', 'grafica2.png')
+    imagen3_path = os.path.join('static', 'grafica3.png')
+    imagen4_path = os.path.join('static', 'grafica4.png')
     if(not os.path.exists(imagen1_path) or not os.path.exists(imagen2_path) or not os.path.exists(imagen3_path) or not os.path.exists(imagen4_path)):   
-        CrearGraficas()
+        #CrearGraficas()
+        pass
 
     # Obtener las materias existentes en la base de datos
     cursor.execute("SELECT idMaterias, nombre FROM materias ORDER BY nombre;")
@@ -314,7 +318,7 @@ def mostrar_materias():
 
 @app.route('/datos_materia/<string:id>')
 def ver_perfil_profesor(id):
-    imagenmateria_path = os.path.join('PIA/static', 'graficaMateria'+id+'.png')
+    imagenmateria_path = os.path.join('static', 'graficaMateria'+id+'.png')
     if(not os.path.exists(imagenmateria_path)):
         CrearGraficaMateria(id)
     cur = mysql.connect.cursor()
@@ -324,7 +328,7 @@ def ver_perfil_profesor(id):
 
 @app.route('/perfil_estudiante/<string:id>')
 def ver_perfil_estudiante(id):
-    imagenestudiante_path = os.path.join('PIA/static', 'graficaEstudiante'+id+'.png')
+    imagenestudiante_path = os.path.join('static', 'graficaEstudiante'+id+'.png')
     if(not os.path.exists(imagenestudiante_path)):
         CrearGraficaEstudiante(id)
     cur = mysql.connect.cursor()
@@ -478,4 +482,4 @@ def eliminar_materia(id):
     return redirect(url_for('mostrar_materias'))
 
 if __name__ == '__main__':
-    app.run(port = 3000, debug = True)
+    app.run(host='0.0.0.0', port = 5000, debug = True)

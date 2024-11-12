@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # Servicio para la aplicación Flask
+  flask-app:
+    build: .
+    container_name: flask_app
+    ports:
+      - "5000:5000"  # Mapea el puerto 3000 del contenedor al puerto 3000 de tu máquina
+    volumes:
+      - .:/app
+      - ./static:/app/static  # Sincroniza el código local con el contenedor
+    environment:
+      - FLASK_DEBUG=development  # Configura Flask en modo de desarrollo
+    depends_on:
+      - mysql  # Asegura que el contenedor de MySQL se inicie antes
+    command: ["./wait-for-it.sh", "mysql_db:3306", "--", "python", "App.py"]  # Espera a que MySQL esté listo
+
+  # Servicio para MySQL
+  mysql:
+    image: mysql:5.7
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234  # Establece la contraseña para el usuario root
+      MYSQL_DATABASE: evaluaciones  # Base de datos que se creará automáticamente
+    ports:
+      - "3307:3306"  # Mapea el puerto 3306 del contenedor al puerto 3306 de tu máquina
+    volumes:
+      - mysql-data:/var/lib/mysql # Persistencia de datos en el volumen
+
+# Volúmenes para almacenar datos de MySQL
+volumes:
+  mysql-data:
+    driver: local
