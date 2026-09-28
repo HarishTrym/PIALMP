@@ -192,8 +192,4 @@ Comandos útiles
 
 # Eliminar contenedores y volúmenes
 
-docker compose down -v
-
-Licencia
-
-Este proyecto está disponible bajo la licencia <MIT / Apache 2.0 / otra>.
+`docker compose down -v`
